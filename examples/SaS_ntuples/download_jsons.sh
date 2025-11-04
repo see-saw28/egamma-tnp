@@ -24,5 +24,3 @@ cp /cvmfs/cms-griddata.cern.ch/cat/metadata/LUM/Run2-2017-UL-NanoAODv9/2021-09-1
 curl https://cms-service-dqmdc.web.cern.ch/CAF/certification/Collisions18/13TeV/Legacy_2018/Cert_314472-325175_13TeV_Legacy2018_Collisions18_JSON.txt -o jsons/Cert_314472-325175_13TeV_Legacy2018_Collisions18_JSON.txt
 cp /cvmfs/cms-griddata.cern.ch/cat/metadata/LUM/Run2-2018-UL-NanoAODv9/2021-09-10/puWeights.json.gz jsons/puWeights_2018.json.gz
 
-
-  

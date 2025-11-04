@@ -3,7 +3,7 @@ define: &goldenJSON_2025 jsons/Collisions25_13p6TeV_391658_398683_DCSOnly_TkPx.j
 
 datasets:
   - name: DataB_2025
-    dataset:  
+    dataset:
       - /EGamma0/Run2025B-PromptReco-v1/NANOAOD
       - /EGamma1/Run2025B-PromptReco-v1/NANOAOD
       - /EGamma2/Run2025B-PromptReco-v1/NANOAOD
@@ -12,7 +12,7 @@ datasets:
       goldenJSON: *goldenJSON_2025
 
   - name: DataC_2025
-    dataset:  
+    dataset:
       - /EGamma0/Run2025C-PromptReco-v1/NANOAOD
       - /EGamma1/Run2025C-PromptReco-v1/NANOAOD
       - /EGamma2/Run2025C-PromptReco-v1/NANOAOD
@@ -26,7 +26,7 @@ datasets:
       goldenJSON: *goldenJSON_2025
 
   - name: DataD_2025
-    dataset:  
+    dataset:
       - /EGamma0/Run2025D-PromptReco-v1/NANOAOD
       - /EGamma1/Run2025D-PromptReco-v1/NANOAOD
       - /EGamma2/Run2025D-PromptReco-v1/NANOAOD
@@ -35,7 +35,7 @@ datasets:
       goldenJSON: *goldenJSON_2025
 
   - name: DataE_2025
-    dataset:  
+    dataset:
       - /EGamma0/Run2025E-PromptReco-v1/NANOAOD
       - /EGamma1/Run2025E-PromptReco-v1/NANOAOD
       - /EGamma2/Run2025E-PromptReco-v1/NANOAOD
@@ -44,7 +44,7 @@ datasets:
       goldenJSON: *goldenJSON_2025
 
   - name: DataF_2025
-    dataset:  
+    dataset:
       - /EGamma0/Run2025F-PromptReco-v1/NANOAOD
       - /EGamma1/Run2025F-PromptReco-v1/NANOAOD
       - /EGamma2/Run2025F-PromptReco-v1/NANOAOD
@@ -57,13 +57,10 @@ datasets:
       goldenJSON: *goldenJSON_2025
 
   - name: DataG_2025
-    dataset:  
+    dataset:
       - /EGamma0/Run2025G-PromptReco-v1/NANOAOD
       - /EGamma1/Run2025G-PromptReco-v1/NANOAOD
       - /EGamma2/Run2025G-PromptReco-v1/NANOAOD
       - /EGamma3/Run2025G-PromptReco-v1/NANOAOD
     metadata:
       goldenJSON: *goldenJSON_2025
-
-  
-  

@@ -1,32 +1,32 @@
 
 datasets:
-  # - name: DataC_2023
-  #   dataset:
-  #   - /EGamma0/Run2023C-24Jan2024_v1-v1/NANOAOD
-  #   - /EGamma0/Run2023C-24Jan2024_v2-v1/NANOAOD
-  #   - /EGamma0/Run2023C-24Jan2024_v3-v1/NANOAOD
-  #   - /EGamma0/Run2023C-24Jan2024_v4-v1/NANOAOD
-  #   - /EGamma1/Run2023C-24Jan2024_v1-v1/NANOAOD
-  #   - /EGamma1/Run2023C-24Jan2024_v2-v1/NANOAOD
-  #   - /EGamma1/Run2023C-24Jan2024_v3-v1/NANOAOD
-  #   - /EGamma1/Run2023C-24Jan2024_v4-v1/NANOAOD
-  #   - /EGamma1/Run2023C-24Jan2024_v4-v1/NANOAOD
-  #   metadata:
-  #     goldenJSON: jsons/Cert_Collisions2023_366442_370790_Golden.json
-  # - name: DataD_2023
-  #   dataset:
-  #   - /EGamma0/Run2023D-24Jan2024_v1-v1/NANOAOD
-  #   - /EGamma0/Run2023D-24Jan2024_v2-v1/NANOAOD
-  #   - /EGamma1/Run2023D-24Jan2024_v1-v1/NANOAOD
-  #   - /EGamma1/Run2023D-24Jan2024_v2-v1/NANOAOD
-  #   metadata:
-  #     goldenJSON: jsons/Cert_Collisions2023_366442_370790_Golden.json
+  - name: DataC_2023
+    dataset:
+    - /EGamma0/Run2023C-24Jan2024_v1-v1/NANOAOD
+    - /EGamma0/Run2023C-24Jan2024_v2-v1/NANOAOD
+    - /EGamma0/Run2023C-24Jan2024_v3-v1/NANOAOD
+    - /EGamma0/Run2023C-24Jan2024_v4-v1/NANOAOD
+    - /EGamma1/Run2023C-24Jan2024_v1-v1/NANOAOD
+    - /EGamma1/Run2023C-24Jan2024_v2-v1/NANOAOD
+    - /EGamma1/Run2023C-24Jan2024_v3-v1/NANOAOD
+    - /EGamma1/Run2023C-24Jan2024_v4-v1/NANOAOD
+    - /EGamma1/Run2023C-24Jan2024_v4-v1/NANOAOD
+    metadata:
+      goldenJSON: jsons/Cert_Collisions2023_366442_370790_Golden.json
+  - name: DataD_2023
+    dataset:
+    - /EGamma0/Run2023D-24Jan2024_v1-v1/NANOAOD
+    - /EGamma0/Run2023D-24Jan2024_v2-v1/NANOAOD
+    - /EGamma1/Run2023D-24Jan2024_v1-v1/NANOAOD
+    - /EGamma1/Run2023D-24Jan2024_v2-v1/NANOAOD
+    metadata:
+      goldenJSON: jsons/Cert_Collisions2023_366442_370790_Golden.json
 
-  # - name: DYto2L_preBPIX
-  #   dataset:
-  #     - /DYto2L-2Jets_MLL-50_TuneCP5_13p6TeV_amcatnloFXFX-pythia8/Run3Summer23NanoAODv13-133X_mcRun3_2023_realistic_ForNanov13_v1-v1/NANOAODSIM
-  #   metadata:
-  #     pileupJSON: jsons/puWeights_2023.json.gz  
+  - name: DYto2L_preBPIX
+    dataset:
+      - /DYto2L-2Jets_MLL-50_TuneCP5_13p6TeV_amcatnloFXFX-pythia8/Run3Summer23NanoAODv13-133X_mcRun3_2023_realistic_ForNanov13_v1-v1/NANOAODSIM
+    metadata:
+      pileupJSON: jsons/puWeights_2023.json.gz  
   - name: DYto2L_postBPIX
     dataset:
       - /DYto2L-2Jets_MLL-50_TuneCP5_13p6TeV_amcatnloFXFX-pythia8/Run3Summer23BPixNanoAODv13-133X_mcRun3_2023_realistic_postBPix_ForNanov13_v2-v1/NANOAODSIM

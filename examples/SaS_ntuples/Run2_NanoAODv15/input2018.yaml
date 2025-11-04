@@ -42,4 +42,3 @@ datasets:
       - /EGamma/Run2018D-UL2018_NanoAODv15-v1/NANOAOD
     metadata:
       goldenJSON: *goldenJSON_2018
-
