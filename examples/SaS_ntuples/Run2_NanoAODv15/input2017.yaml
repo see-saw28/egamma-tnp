@@ -29,7 +29,7 @@ datasets:
     metadata:
       goldenJSON: *goldenJSON_2017
   - name: DataD_2017
-    dataset:  
+    dataset:
       - /DoubleEG/Run2017D-UL2017_NanoAODv15-v1/NANOAOD
     metadata:
       goldenJSON: *goldenJSON_2017
