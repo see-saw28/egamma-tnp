@@ -70,7 +70,7 @@ datasets:
   - name: DataG_2016
     dataset:
       - /DoubleEG/Run2016G-UL2016_NanoAODv15-v1/NANOAOD
-    metadata:       
+    metadata:
       goldenJSON: *goldenJSON_2016
 
   - name: DataH_2016
