@@ -11,7 +11,7 @@ datasets:
       - /DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8/RunIISummer20UL16NanoAODAPVv15-150X_mcRun2_asymptotic_preVFP_v1-v1/NANOAODSIM
     metadata:
       pileupJSON: jsons/puWeights_2016preVFP.json.gz
-    
+
   - name: DYJetsToLL_madgraph_2016_preVFP
     dataset:
       - /DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer20UL16NanoAODAPVv15-150X_mcRun2_asymptotic_preVFP_v1-v5/NANOAODSIM
@@ -23,7 +23,7 @@ datasets:
       - /DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8/RunIISummer20UL16NanoAODv15-150X_mcRun2_asymptotic_v1-v1/NANOAODSIM
     metadata:
       pileupJSON: jsons/puWeights_2016postVFP.json.gz
-  
+
   - name: DYJetsToLL_madgraph_2016_postVFP
     dataset:
       - /DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer20UL16NanoAODv15-150X_mcRun2_asymptotic_v1-v1/NANOAODSIM
@@ -36,7 +36,7 @@ datasets:
       - /DoubleEG/Run2016B-HIPM_UL2016_NanoAODv15_v2-v1/NANOAOD
     metadata:
       goldenJSON: *goldenJSON_2016
-  
+
   - name: DataC_HIPM_2016
     dataset:
       - /DoubleEG/Run2016C-HIPM_UL2016_NanoAODv15-v1/NANOAOD
@@ -66,13 +66,13 @@ datasets:
       - /DoubleEG/Run2016F-UL2016_NanoAODv15-v1/NANOAOD
     metadata:
       goldenJSON: *goldenJSON_2016
-  
+
   - name: DataG_2016
     dataset:
       - /DoubleEG/Run2016G-UL2016_NanoAODv15-v1/NANOAOD
     metadata:       
       goldenJSON: *goldenJSON_2016
-  
+
   - name: DataH_2016
     dataset:
       - /DoubleEG/Run2016H-UL2016_NanoAODv15-v1/NANOAOD
