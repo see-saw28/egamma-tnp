@@ -70,6 +70,8 @@ merge-parquet = "egamma_tnp.scripts.merge_parquet:main"
 prepare-histograms = "egamma_tnp.scripts.prepare_histograms:main"
 fetch-datasets = "egamma_tnp.scripts.fetch_datasets:main"
 get-unprocessed-partitions = "egamma_tnp.scripts.get_unprocessed_partitions:main"
+get-unprocessed-files = "egamma_tnp.scripts.get_unprocessed_files:main"
+post-process = "egamma_tnp.scripts.postprocessing:main"
 
 [tool.hatch]
 version.source = "vcs"

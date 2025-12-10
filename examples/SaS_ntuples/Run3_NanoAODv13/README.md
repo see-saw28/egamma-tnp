@@ -18,3 +18,7 @@ run-analysis --config config.json  --fileset Run3_NanoAODv13/input22.json  --out
 ```
 run-analysis --config config.json  --fileset Run3_NanoAODv13/input23.json  --output outputEGM_NanoAODv13/2023 --executor dask/lxplus --scaleout 200 --memory 5GiB --log-directory logs
 ```
+
+```
+get-unprocessed-partitions --input-json Run3_NanoAODv13/input22.json --output-location outputEGM_NanoAODv13/2022 --output-json Run3_NanoAODv13/u_input22.json
+```
