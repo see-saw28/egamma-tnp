@@ -3,9 +3,10 @@
   # 2017 #
   ########
 
-define: &goldenJSON_2017 jsons/Cert_294927-306462_13TeV_UL2017_Collisions17_JSON.txt
+define: &goldenJSON_2017 jsons/Cert_294927-306462_13TeV_UL2017_Collisions17_GoldenJSON.txt
 
 datasets:
+  # -- DYJetsToLL samples
   - name: DYJetsToLL_amcatnlo_2017
     dataset:
       - /DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8/RunIISummer20UL17NanoAODv15-150X_mc2017_realistic_v1-v1/NANOAODSIM
@@ -18,6 +19,7 @@ datasets:
     metadata:
       pileupJSON: jsons/puWeights_2017.json.gz
 
+  # -- Data samples
   - name: DataB_2017
     dataset:
       - /DoubleEG/Run2017B-UL2017_NanoAODv15-v1/NANOAOD

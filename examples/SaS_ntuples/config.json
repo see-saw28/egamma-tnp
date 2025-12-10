@@ -53,7 +53,9 @@
             "mvaNoIso",
             "mvaNoIso_WP80",
             "mvaNoIso_WP90",
-            "promptMVA"
+            "promptMVA",
+            "seediEtaOriX",
+            "seediPhiOriY"
           ],
           "Rho": "all"
         },

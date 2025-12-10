@@ -1,4 +1,4 @@
-mkdir jsons
+mkdir -p jsons
 
 #Download 2022 golden JSON and pileup JSON
 curl https://cms-service-dqmdc.web.cern.ch/CAF/certification/Collisions22/Cert_Collisions2022_355100_362760_Golden.json -o jsons/Cert_Collisions2022_355100_362760_Golden.json
@@ -14,6 +14,8 @@ cp /cvmfs/cms-griddata.cern.ch/cat/metadata/LUM/Run3-23DSep23-Summer23BPix-NanoA
 # Download 2024 golden JSON and pileup JSON
 curl https://cms-service-dqmdc.web.cern.ch/CAF/certification/Collisions24/Cert_Collisions2024_378981_386951_Golden.json -o jsons/Cert_Collisions2024_378981_386951_Golden.json
 cp /afs/cern.ch/user/p/pagaigne/public/pileup_jsons/puWeights_2024.json.gz jsons/puWeights_2024.json.gz
+
+curl https://cms-service-dqmdc.web.cern.ch/CAF/certification/Collisions25/Cert_Collisions2025_391658_398860_Golden.json -o jsons/Cert_Collisions2025_391658_398860_Golden.json
 
 # Download 2016, 2017, 2018 golden JSON and pileup JSONs
 curl https://cms-service-dqmdc.web.cern.ch/CAF/certification/Collisions16/13TeV/Legacy_2016/Cert_271036-284044_13TeV_Legacy2016_Collisions16_JSON.txt -o jsons/Cert_271036-284044_13TeV_Legacy2016_Collisions16_JSON.txt

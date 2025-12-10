@@ -1,5 +1,5 @@
 
-define: &goldenJSON_2025 jsons/Collisions25_13p6TeV_391658_398683_DCSOnly_TkPx.json
+define: &goldenJSON_2025 jsons/Cert_Collisions2025_391658_398860_Golden.json
 
 datasets:
   - name: DataB_2025

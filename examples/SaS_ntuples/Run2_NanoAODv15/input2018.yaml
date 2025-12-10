@@ -6,12 +6,12 @@
 define: &goldenJSON_2018 jsons/Cert_314472-325175_13TeV_Legacy2018_Collisions18_JSON.txt
 
 datasets:
+  # -- DYJetsToLL samples
   - name: DYJetsToLL_amcatnlo_2018
     dataset:
       - /DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8/RunIISummer20UL18NanoAODv15-150X_mc2018_realistic_v1-v1/NANOAODSIM
     metadata:
       pileupJSON: jsons/puWeights_2018.json.gz
-
   - name: DYJetsToLL_madgraph_2018
     dataset:
       - /DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer20UL18NanoAODv15-150X_mc2018_realistic_v1-v2/NANOAODSIM
@@ -19,6 +19,7 @@ datasets:
     metadata:
       pileupJSON: jsons/puWeights_2018.json.gz
 
+  # -- Data samples
   - name: DataA_2018
     dataset:
       - /EGamma/Run2018A-UL2018_NanoAODv15-v1/NANOAOD
