@@ -19,6 +19,7 @@ from egamma_tnp import (
     PhotonTagNProbeFromMiniNTuples,
     PhotonTagNProbeFromNanoAOD,
     ScaleAndSmearingNTuplesFromNanoAOD,
+    ZllgNTuplesFromNanoAOD,
 )
 
 logger = logging.getLogger(__name__)
@@ -130,6 +131,7 @@ def initialize_class(config, args, fileset):
         "PhotonTagNProbeFromNanoAOD": PhotonTagNProbeFromNanoAOD,
         "PhotonTagNProbeFromMiniNTuples": PhotonTagNProbeFromMiniNTuples,
         "ScaleAndSmearingNTuplesFromNanoAOD": ScaleAndSmearingNTuplesFromNanoAOD,
+        "ZllgNTuplesFromNanoAOD": ZllgNTuplesFromNanoAOD,
     }
     class_name = config["workflow"]
     workflow = class_map[class_name]

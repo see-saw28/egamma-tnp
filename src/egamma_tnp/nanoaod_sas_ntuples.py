@@ -5,6 +5,7 @@ import warnings
 import dask_awkward as dak
 import numpy as np
 from coffea.nanoevents import NanoAODSchema
+from coffea.analysis_tools import PackedSelection
 
 from egamma_tnp._base_ntuplizer import BaseNTuplizer
 from egamma_tnp.utils import calculate_photon_SC_eta
@@ -214,3 +215,266 @@ class ScaleAndSmearingNTuplesFromNanoAOD(BaseNTuplizer):
                     dileptons[f"{collection}_{var}"] = events[collection][var]
 
         return dileptons
+
+
+class ZllgNTuplesFromNanoAOD(BaseNTuplizer):
+    def __init__(
+        self,
+        fileset,
+        *,
+        near_pt_cut=10,
+        far_pt_cut=20,
+        eta_cut=2.5,
+        photon_pt_cut=10,
+        photon_eta_cut=2.5,
+        dilepton_mass_range=(35, 180),
+        mllg_range=(60, 120),
+        max_ll_llg_mass=180,
+        max_fsr_photon_dR=0.8,
+        use_muons=False,
+        trigger_paths=None,
+        extra_filter=None,
+        extra_filter_args=None,
+        avoid_ecal_transition=False,
+    ):
+        """Scale and smear NTuples from NanoAOD.
+
+        Parameters
+        ----------
+            fileset: dict
+                Dictionary specifying the input files to process.
+            lead_pt_cut: float, optional
+                Minimum transverse momentem for the leading electron. The default is 20.
+            sublead_pt_cut: float, optional
+                Minimum transverse momentum for the subleading electron. The default is 10.
+            eta_cut: float, optional
+                Maximum absolute pseudorapidity for electrons. The default is 2.5.
+            trigger_paths: list or str, optional
+                List of trigger path names to apply as event selection. The default is None.
+            extra_filter: Callable, optional
+                Function to further filter events. The default is None.
+                Must take in a coffea NanoEventsArray and return a filtered NanoEventsArray of the events you want to keep.
+            extra_filter_args: dict, optional
+                Arguments to pass to extra_filter. The default is {}.
+            avoid_ecal_transition: bool, optional
+                Whether to exclude electrons in the ECAL transition region. The default is False.
+        """
+
+        super().__init__(
+            fileset=fileset,
+            schemaclass=NanoAODSchema,
+        )
+
+        self.near_pt_cut = near_pt_cut
+        self.far_pt_cut = far_pt_cut
+        self.photon_pt_cut = photon_pt_cut
+        self.photon_eta_cut = photon_eta_cut
+        self.dilepton_mass_range = dilepton_mass_range
+        self.mllg_range = mllg_range
+        self.max_ll_llg_mass = max_ll_llg_mass
+        self.max_fsr_photon_dR = max_fsr_photon_dR
+        self.use_muons = use_muons
+        self.eta_cut = eta_cut
+        self.trigger_paths = trigger_paths
+        self.extra_filter = extra_filter
+        self.Zmass = 91.2
+        if extra_filter_args is None:
+            extra_filter_args = {}
+        self.extra_filter_args = extra_filter_args
+        self.avoid_ecal_transition = avoid_ecal_transition
+
+    def __repr__(self):
+        n_of_files = 0
+        for dataset in self.fileset.values():
+            n_of_files += len(dataset["files"])
+        return f"ZllgNTuplesFromNanoAOD(Number of files: {n_of_files})"
+
+    def make_ntuples(self, events, mass_range, vars):
+        if events.metadata.get("isMC") is None:
+            events.metadata["isMC"] = hasattr(events, "GenPart")
+            if events.metadata.get("isMC") and "genWeight" in events.fields:
+                sum_genw_before_presel = dak.sum(events.genWeight)
+            else:
+                sum_genw_before_presel = 1.0
+        if self.extra_filter is not None:
+            events = self.extra_filter(events, **self.extra_filter_args)
+
+        if events.metadata.get("goldenJSON") and not events.metadata.get("isMC"):
+            events = self.apply_goldenJSON(events)
+
+        # apply the trigger path filter if specified
+        good_events = self.apply_trigger_paths(events, self.trigger_paths)
+
+        # add superclusterEta to the Photon and Electron objects if not already present
+        if "superclusterEta" not in good_events.Photon.fields:
+            good_events["Photon", "superclusterEta"] = calculate_photon_SC_eta(good_events.Photon, good_events.PV)
+        if "superclusterEta" not in good_events.Electron.fields:
+            good_events["Electron", "superclusterEta"] = good_events.Electron.eta + good_events.Electron.deltaEtaSC
+
+        # selecting leptons passing the pt and eta cuts
+        if self.use_muons:
+            good_events["Muon"] = good_events.Muon[
+            (good_events.Muon.pt > self.near_pt_cut)
+            & (np.abs(good_events.Muon.eta) < self.eta_cut)
+            ]
+        else:
+            good_events["Electron"] = good_events.Electron[
+                (good_events.Electron.pt > self.near_pt_cut)
+                & (np.abs(good_events.Electron.superclusterEta) < self.eta_cut)
+            ]
+            # avoid the ECAL transition region for the electrons with an eta cut
+            if self.avoid_ecal_transition:
+                good_events["Electron"] = good_events.Electron[
+                    ~((np.abs(good_events.Electron.superclusterEta) > 1.4442) & (np.abs(good_events.Electron.superclusterEta) < 1.566))
+                ]
+
+                good_events["Photon"] = good_events.Photon[
+                    ~((np.abs(good_events.Photon.superclusterEta) > 1.4442) & (np.abs(good_events.Photon.superclusterEta) < 1.566))
+                ]
+
+        # selecting photons passing the pt and eta cuts without being matched to electrons
+        good_events["Photon"] = good_events.Photon[
+            (good_events.Photon.electronIdx < 0)
+            & (good_events.Photon.pt > self.photon_pt_cut)
+            & (np.abs(good_events.Photon.superclusterEta) < self.photon_eta_cut)
+        ]
+        
+        if self.use_muons:
+            good_events = good_events[(dak.num(good_events.Muon) >= 2) & (dak.num(good_events.Photon) >= 1)]
+        else:
+            good_events = good_events[(dak.num(good_events.Electron) >= 2) & (dak.num(good_events.Photon) >= 1)]
+        # electrons = good_events.Electron
+        # electron_fields = list(electrons.fields)
+
+        # # get the matched photons
+        # matched_photons = good_events.Photon[electrons.photonIdx]
+        # photon_fields = list(matched_photons.fields)
+
+        # # update the vars dictionary with the fields to save
+        # if vars is None:
+        #     vars = {"Electron": electron_fields, "Photon": photon_fields}
+        # else:
+        #     if "Electron" not in vars or vars["Electron"] == "all":
+        #         vars["Electron"] = electron_fields
+        #     if "Photon" not in vars:
+        #         vars["Photon"] = []
+        #         warnings.warn("vars does not contain 'Photon' key, not saving photon variables", UserWarning, stacklevel=2)
+        #     elif vars["Photon"] == "all":
+        #         vars["Photon"] = photon_fields
+
+        # # add GenPart information if available
+        # if good_events.metadata.get("isMC"):
+        #     electrons["gen_pt"] = good_events.GenPart[electrons.genPartIdx].pt
+        #     vars["Electron"] += ["gen_pt"]
+
+        # # add the matched photon variables to the electrons
+        # for var in vars["Photon"]:
+        #     electrons[f"pho_{var}"] = matched_photons[var]
+
+        # good_events["Electron"] = electrons
+        if self.use_muons:
+            dileptons = dak.combinations(good_events.Muon, 2, fields=["lead", "sublead"])
+        else:
+            dileptons = dak.combinations(good_events.Electron, 2, fields=["lead", "sublead"])
+
+        z_cands = self.get_llg(dileptons, good_events.Photon)
+        
+
+        # flatten the output
+        output = {}
+        output = ScaleAndSmearingNTuplesFromNanoAOD._save_event_variables(good_events, output, vars=vars)
+
+        for field in dak.fields(z_cands):
+            if field in ["lepton_far", "lepton_near", "photon"]:
+                for subfield in dak.fields(z_cands[field]):
+                    output[f"{field}_{subfield}"] = z_cands[field][subfield]
+            elif field in ["dilepton", "llg"]:
+                pass
+            else:
+                output[field] = z_cands[field]
+
+        output = apply_pileup_weights(output, good_events, sum_genw_before_presel=sum_genw_before_presel, syst=True)
+
+        return dak.zip(output)
+
+
+    def get_llg(self, dileptons, photons):
+        sel_obj = PackedSelection()
+        sel_dileptons = (
+            (dileptons["lead"].pdgId + dileptons["sublead"].pdgId == 0)
+        )
+        good_dileptons = dileptons[sel_dileptons]
+
+        good_photons = photons
+        # good_photons = events_two.FsrPhoton[(events_two.FsrPhoton.pt > 10) & (events_two.FsrPhoton.pt < 1200)]
+        good_photons['mass'] = dak.zeros_like(good_photons.pt)
+        good_photons['charge'] = dak.zeros_like(good_photons.pt)
+
+        llg_jagged = dak.cartesian({"dilepton": good_dileptons, "photon": good_photons}, axis=1)
+        # flatten llg, selection only accept flatten arrays
+        count = dak.num(llg_jagged, axis=1)
+        llg = dak.flatten(llg_jagged)
+
+        dR_muon1_photon = llg.dilepton.lead.deltaR(llg.photon)
+        dR_muon2_photon = llg.dilepton.sublead.deltaR(llg.photon)
+        sel_obj.add(
+            "deltaR",
+            dak.where(dR_muon1_photon < dR_muon2_photon, dR_muon1_photon, dR_muon2_photon)
+            < self.max_fsr_photon_dR,
+        )
+        # far muon pt
+        lepton_far = dak.where(
+            dR_muon1_photon > dR_muon2_photon, llg.dilepton.lead, llg.dilepton.sublead
+        )
+        lepton_near = dak.where(
+            ~(dR_muon1_photon > dR_muon2_photon), llg.dilepton.lead, llg.dilepton.sublead
+        )
+        sel_obj.add("farlepton_pt", lepton_far.pt > self.far_pt_cut)
+        # dilepton obj
+        dilepton_obj = llg.dilepton.lead + llg.dilepton.sublead
+        sel_obj.add("dilepton_mass", (dilepton_obj.mass > self.dilepton_mass_range[0]) & (dilepton_obj.mass < self.dilepton_mass_range[1]))
+        # llg obj
+        llg_obj = llg.dilepton.lead + llg.dilepton.sublead + llg.photon
+        sel_obj.add(
+            "llg_mass",
+            (llg_obj.mass > self.mllg_range[0]) & (llg_obj.mass < self.mllg_range[1]),
+        )
+        sel_obj.add(
+            "dilepton_llg_mass", (dilepton_obj.mass + llg_obj.mass) < self.max_ll_llg_mass
+        )
+        final_sel_obj = sel_obj.all(*(sel_obj.names))
+
+        # unflatten
+        final_sel_obj = dak.unflatten(final_sel_obj, count)
+               
+        # dress other variables
+        llg["lepton_far"] = lepton_far
+        llg["lepton_near"] = lepton_near
+        llg["dilepton"] = dilepton_obj
+        llg["llg"] = llg_obj
+
+        llg_jagged = dak.unflatten(llg, count)
+
+        llg_jagged = llg_jagged[final_sel_obj]
+
+        # event selection
+        zlike_idx = dak.argmin(abs(llg_jagged.llg.mass - self.Zmass), axis=1)
+        # get best matched llg for each event
+        best_llg = dak.firsts(llg_jagged[dak.singletons(zlike_idx)])
+
+        best_llg['dilepton_mass'] = best_llg.dilepton.mass
+        best_llg['dilepton_pt'] = best_llg.dilepton.pt
+        best_llg['dilepton_eta'] = best_llg.dilepton.eta
+        best_llg['dilepton_phi'] = best_llg.dilepton.phi
+
+        best_llg['llg_mass'] = best_llg.llg.mass
+        best_llg['llg_pt'] = best_llg.llg.pt
+        best_llg['llg_eta'] = best_llg.llg.eta
+        best_llg['llg_phi'] = best_llg.llg.phi
+
+        best_llg["lepton_near_dR"] = best_llg.photon.delta_r(best_llg.lepton_near)
+        best_llg["lepton_far_dR"] = best_llg.photon.delta_r(best_llg.lepton_far)
+
+        return best_llg
+
+ 

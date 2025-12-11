@@ -83,7 +83,7 @@ def apply_pileup_weights(dileptons, events, sum_genw_before_presel=1.0, syst=Fal
             weights.add("genWeight", dak.ones_like(events.event))
 
         if pileup_corr is not None:
-            pileup_weight_nom, pileup_weight_up, pileup_weight_down = get_pileup_weight(dileptons.nTrueInt, pileup_corr, syst=syst)
+            pileup_weight_nom, pileup_weight_up, pileup_weight_down = get_pileup_weight(events.Pileup.nTrueInt, pileup_corr, syst=syst)
             weights.add("Pileup", pileup_weight_nom, pileup_weight_up if syst else None, pileup_weight_down if syst else None)
 
             dileptons["weight_central"] = pileup_weight_nom
