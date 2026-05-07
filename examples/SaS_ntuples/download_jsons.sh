@@ -17,6 +17,8 @@ cp /afs/cern.ch/user/p/pagaigne/public/pileup_jsons/puWeights_2024.json.gz jsons
 
 curl https://cms-service-dqmdc.web.cern.ch/CAF/certification/Collisions25/Cert_Collisions2025_391658_398860_Golden.json -o jsons/Cert_Collisions2025_391658_398860_Golden.json
 
+curl https://cms-service-dqmdc.web.cern.ch/CAF/certification/Collisions26/Cert_Collisions2026_401624_402537_golden.json -o jsons/Cert_Collisions2026_401624_402537_golden.json
+
 # Download 2016, 2017, 2018 golden JSON and pileup JSONs
 curl https://cms-service-dqmdc.web.cern.ch/CAF/certification/Collisions16/13TeV/Legacy_2016/Cert_271036-284044_13TeV_Legacy2016_Collisions16_JSON.txt -o jsons/Cert_271036-284044_13TeV_Legacy2016_Collisions16_JSON.txt
 cp /cvmfs/cms-griddata.cern.ch/cat/metadata/LUM/Run2-2016preVFP-UL-NanoAODv9/2021-09-10/puWeights.json.gz jsons/puWeights_2016preVFP.json.gz
@@ -25,3 +27,5 @@ curl https://cms-service-dqmdc.web.cern.ch/CAF/certification/Collisions17/13TeV/
 cp /cvmfs/cms-griddata.cern.ch/cat/metadata/LUM/Run2-2017-UL-NanoAODv9/2021-09-10/puWeights.json.gz jsons/puWeights_2017.json.gz
 curl https://cms-service-dqmdc.web.cern.ch/CAF/certification/Collisions18/13TeV/Legacy_2018/Cert_314472-325175_13TeV_Legacy2018_Collisions18_JSON.txt -o jsons/Cert_314472-325175_13TeV_Legacy2018_Collisions18_JSON.txt
 cp /cvmfs/cms-griddata.cern.ch/cat/metadata/LUM/Run2-2018-UL-NanoAODv9/2021-09-10/puWeights.json.gz jsons/puWeights_2018.json.gz
+
+

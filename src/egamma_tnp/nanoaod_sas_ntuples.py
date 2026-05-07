@@ -203,7 +203,7 @@ class ScaleAndSmearingNTuplesFromNanoAOD(BaseNTuplizer):
         if events.metadata.get("isMC"):
             dileptons["genWeight"] = events.genWeight
             dileptons["nTrueInt"] = events.Pileup.nTrueInt
-            dileptons["dZ"] = events.GenVtx.z - events.PV.z
+            # dileptons["dZ"] = events.GenVtx.z - events.PV.z
         # Fill zeros for data because there is no GenVtx for data, obviously
         else:
             dileptons["dZ"] = dak.zeros_like(events.PV.z)
@@ -399,67 +399,51 @@ class ZllgNTuplesFromNanoAOD(BaseNTuplizer):
 
 
     def get_llg(self, dileptons, photons):
-        sel_obj = PackedSelection()
-        sel_dileptons = (
-            (dileptons["lead"].pdgId + dileptons["sublead"].pdgId == 0)
-        )
+        # --- Early filtering ---
+        sel_dileptons = (dileptons["lead"].pdgId + dileptons["sublead"].pdgId == 0)
         good_dileptons = dileptons[sel_dileptons]
 
+        # --- Prepare photons ---
         good_photons = photons
-        # good_photons = events_two.FsrPhoton[(events_two.FsrPhoton.pt > 10) & (events_two.FsrPhoton.pt < 1200)]
-        good_photons['mass'] = dak.zeros_like(good_photons.pt)
-        good_photons['charge'] = dak.zeros_like(good_photons.pt)
+        good_photons["mass"] = dak.zeros_like(good_photons.pt)
+        good_photons["charge"] = dak.zeros_like(good_photons.pt)
 
+        # --- Cartesian product (lazy) ---
+        # keep the jagged structure throughout to avoid partition-misalignment
         llg_jagged = dak.cartesian({"dilepton": good_dileptons, "photon": good_photons}, axis=1)
-        # flatten llg, selection only accept flatten arrays
-        count = dak.num(llg_jagged, axis=1)
-        llg = dak.flatten(llg_jagged)
 
-        dR_muon1_photon = llg.dilepton.lead.deltaR(llg.photon)
-        dR_muon2_photon = llg.dilepton.sublead.deltaR(llg.photon)
-        sel_obj.add(
-            "deltaR",
-            dak.where(dR_muon1_photon < dR_muon2_photon, dR_muon1_photon, dR_muon2_photon)
-            < self.max_fsr_photon_dR,
-        )
-        # far muon pt
-        lepton_far = dak.where(
-            dR_muon1_photon > dR_muon2_photon, llg.dilepton.lead, llg.dilepton.sublead
-        )
-        lepton_near = dak.where(
-            ~(dR_muon1_photon > dR_muon2_photon), llg.dilepton.lead, llg.dilepton.sublead
-        )
-        sel_obj.add("farlepton_pt", lepton_far.pt > self.far_pt_cut)
-        # dilepton obj
-        dilepton_obj = llg.dilepton.lead + llg.dilepton.sublead
-        sel_obj.add("dilepton_mass", (dilepton_obj.mass > self.dilepton_mass_range[0]) & (dilepton_obj.mass < self.dilepton_mass_range[1]))
-        # llg obj
-        llg_obj = llg.dilepton.lead + llg.dilepton.sublead + llg.photon
-        sel_obj.add(
-            "llg_mass",
-            (llg_obj.mass > self.mllg_range[0]) & (llg_obj.mass < self.mllg_range[1]),
-        )
-        sel_obj.add(
-            "dilepton_llg_mass", (dilepton_obj.mass + llg_obj.mass) < self.max_ll_llg_mass
-        )
-        final_sel_obj = sel_obj.all(*(sel_obj.names))
+        # --- Compute dR and selections in jagged form (no flatten/unflatten) ---
+        dR_muon1_photon = llg_jagged.dilepton.lead.deltaR(llg_jagged.photon)
+        dR_muon2_photon = llg_jagged.dilepton.sublead.deltaR(llg_jagged.photon)
+        min_dR = dak.where(dR_muon1_photon < dR_muon2_photon, dR_muon1_photon, dR_muon2_photon)
 
-        # unflatten
-        final_sel_obj = dak.unflatten(final_sel_obj, count)
-               
-        # dress other variables
-        llg["lepton_far"] = lepton_far
-        llg["lepton_near"] = lepton_near
-        llg["dilepton"] = dilepton_obj
-        llg["llg"] = llg_obj
+        # --- Select far/near leptons ---
+        lepton_far = dak.where(dR_muon1_photon > dR_muon2_photon, llg_jagged.dilepton.lead, llg_jagged.dilepton.sublead)
+        lepton_near = dak.where(~(dR_muon1_photon > dR_muon2_photon), llg_jagged.dilepton.lead, llg_jagged.dilepton.sublead)
 
-        llg_jagged = dak.unflatten(llg, count)
+        # --- Compute dilepton and llg objects ---
+        dilepton_obj = llg_jagged.dilepton.lead + llg_jagged.dilepton.sublead
+        llg_obj = dilepton_obj + llg_jagged.photon
 
-        llg_jagged = llg_jagged[final_sel_obj]
+        # --- Build per-candidate mask (jagged) and apply it directly ---
+        mask = (
+            (min_dR < self.max_fsr_photon_dR)
+            & (lepton_far.pt > self.far_pt_cut)
+            & ((dilepton_obj.mass > self.dilepton_mass_range[0]) & (dilepton_obj.mass < self.dilepton_mass_range[1]))
+            & ((llg_obj.mass > self.mllg_range[0]) & (llg_obj.mass < self.mllg_range[1]))
+            & ((dilepton_obj.mass + llg_obj.mass) < self.max_ll_llg_mass)
+        )
 
-        # event selection
+        # dress other variables and filter jagged structure in-place
+        llg_jagged["lepton_far"] = lepton_far
+        llg_jagged["lepton_near"] = lepton_near
+        llg_jagged["dilepton"] = dilepton_obj
+        llg_jagged["llg"] = llg_obj
+
+        llg_jagged = llg_jagged[mask]
+
+        # --- Select best llg per event ---
         zlike_idx = dak.argmin(abs(llg_jagged.llg.mass - self.Zmass), axis=1)
-        # get best matched llg for each event
         best_llg = dak.firsts(llg_jagged[dak.singletons(zlike_idx)])
 
         best_llg['dilepton_mass'] = best_llg.dilepton.mass
